@@ -1,38 +1,62 @@
 #ifndef ROMAN_H
 #define ROMAN_H
 
+#include<iostream>
 #include<string>
 #include<vector>
 
 namespace Roman {
-    // Literal values of Roman numerals:
-    enum class Roman_num: int {I=1, V=5, X=10, L=50, C=100, D=500, M=1000};
-    // Sequential priority of Roman numerals:
-    enum class Roman_seq: int {M=1, D=2, C=3, L=4, X=5, V=6, I=7};
+    
+/* ====== Roman_lett section begins ======= */
 
-    struct Rom_arab_tok {
-        std::string roman;
-        int arab;
+    // An enum class to define Roman letters and associated values:
+    enum class Roman_lett: int {N=0, I=1, V=5, X=10, L=50, C=100, D=500, M=1000}; 
+    
+    // Helper functions for Roman_lett:
+    Roman_lett char_to_num(char& c);    // convert chars to Roman_lett
+    char num_to_char(Roman_lett& l);            
+    
+    // Exception class(es) for Roman_lett
+    class Not_rom_lett{};
+    class Invalid_format{};
+ 
+/* ------ Roman_lett section ends ------ */
+    
+/* ====== Roman_int section begins ======= */
+    
+    struct Token {
+        std::vector<Roman_lett> digit;
+        int value;
     };
 
+    // a class to store roman "digits"
     class Roman_int {
-    public:
-        Roman_int(std::string romnum);
+    public:    
+        Roman_int(std::string str);
         Roman_int();
         
-        // return Roman numeral as int:
-        int as_int();
-    
+        class Buffer_full{};
+        
+        std::string const rom_value();
+        int const int_value();
     private:
-        std::vector<Rom_arab_tok> vtok;
+        std::string sroman;
+        std::vector<Token> vtok;
+        
+        Roman_lett lettbuff;
+        bool lettfull;
+        
+        Roman_lett get_letter();
+        void putback(Roman_lett& tok);
+        Token digit();
+        Token evaluate(Roman_lett& lett1);
+        bool valid_sub(Roman_lett& lett1, Roman_lett& lett2);
     };
     
-    // Helper functions for Roman_int:
-    bool is_valid_char(); // check if Roman numeral contains characters specified in Roman_num only
-    bool is_valid_num(); // check if Roman numeral is in the right format
-    Rom_arab_tok decomp_num(std::string romin); // decompose Roman numeral string into tokens
-    std::string recomp_num(std::vector<Rom_arab_tok> romout);
-    
+
+
+/* ------ Roman_int section ends ------ */
+
 
 } // End of namespace Roman
 #endif
