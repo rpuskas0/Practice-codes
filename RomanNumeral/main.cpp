@@ -1,6 +1,8 @@
-#include <iostream>
+#include "roman.h"
 
-int main(int argc, char **argv) {
-    std::cout << "Hello, world!" << std::endl;
-    return 0;
+int main() {
+    Roman::Roman_int rom;
+    std::cout << "Please type a roman numeral: ";
+    std::cin >> rom;
+    std::cout << std::endl << "Int value of " << rom << " is: " << rom.int_value() << std::endl;
 }

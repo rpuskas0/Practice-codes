@@ -71,43 +71,69 @@ namespace Roman {
 /* ====== Roman_int section begins ======= */
     
     
-    Roman_int::Roman_int(std::string str) {}
-    Roman_int::Roman_int() {}
+    Roman_int::Roman_int(std::string str) {
+        try {
+            sroman=str;
+            ival=numeral();
+        } catch (...) {
+            std::cerr << "\nInvalid Roman numeral!\n";
+        }
+    }
+    
+    Roman_int default_val() {
+        static std::string val="N";
+        return val;
+    }
+    
+    Roman_int::Roman_int() {
+        sroman=default_val().rom_value();
+        ival=default_val().int_value();
+    }
     
 
     Roman_lett Roman_int::get_letter() {
         if (lettfull) {lettfull=false; return lettbuff;}
         else {
-            int count=0;
             char ch;
-            ch=sroman[count];
-            ++count;
+            ch=sroman[icount];
+            ++icount;
             return char_to_num(ch);
         }
     }
+      
+    Token Roman_int::digit() {
+       Token tok;
+       Roman_lett lett1=get_letter();
         
+       if (lett1==Roman_lett::N) {
+           tok.digit.push_back(lett1);
+           tok.value=static_cast<int>(lett1);
+           return tok;
+       }
+        
+       else {
+           tok=evaluate(lett1);
+           return tok;
+       }
+    }
+    
+    
+    int Roman_int::numeral() {
+        int sum=0;
+        while (true) {
+            Token tok=digit();
+            sum+=tok.value;
+            vtok.push_back(tok);
+        }
+        return sum;
+    }
+    
     void Roman_int::putback(Roman_lett& lett) {
         if (lettfull) throw Buffer_full{};
         lettbuff=lett;
         lettfull=true;
     }
     
-    Token Roman_int::digit() {
-        Token tok;
-        Roman_lett lett1=get_letter();
-        
-        if (lett1==Roman_lett::N) {
-            tok.digit.push_back(lett1);
-            tok.value=static_cast<int>(lett1);
-            return tok;
-        }
-        
-        else {
-            tok=evaluate(lett1);
-            return tok;
-        }
-    }
-
     
     Token Roman_int::evaluate(Roman_lett& lett1) {
         Token tok;
@@ -147,12 +173,28 @@ namespace Roman {
         return tok;
     }
     
+    
     bool Roman_int::valid_sub(Roman_lett& lett1, Roman_lett& lett2) {
         int num1=static_cast<int>(lett1);
         int num2=static_cast<int>(lett2);
         if (num1<(num2/10)) {return false;} // Cannot subtract values more than 10x smaller
         else if (lett1==Roman_lett::D || lett1==Roman_lett::L) {return false;} // D && L are not subtractable values
         else {return true;}
+    }
+    
+    
+    
+    // operator overloads for Roman_int:
+    std::istream& operator>>(std::istream& is, Roman_int& ri) {
+        std::string str;
+        is >> str;
+        ri=Roman_int(str);
+        return is;
+    }
+    std::ostream& operator<<(std::ostream& os, const Roman_int& ri) {
+        std::string str=ri.rom_value();
+        os << str;
+        return os;
     }
     
 /* ------ Roman_int section ends ------ */

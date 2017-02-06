@@ -37,24 +37,31 @@ namespace Roman {
         
         class Buffer_full{};
         
-        std::string const rom_value();
-        int const int_value();
+        std::string rom_value() const {return sroman;}
+        int int_value() const {return ival;}
     private:
         std::string sroman;
         std::vector<Token> vtok;
+        int ival=0;
         
+        int icount=0;
         Roman_lett lettbuff;
         bool lettfull;
         
         Roman_lett get_letter();
-        void putback(Roman_lett& tok);
         Token digit();
+        int numeral();
+        void putback(Roman_lett& tok);
         Token evaluate(Roman_lett& lett1);
         bool valid_sub(Roman_lett& lett1, Roman_lett& lett2);
     };
     
-
-
+    
+    // operator overloads for Roman_int:
+    std::istream& operator>>(std::istream& is, Roman_int& ri);
+    std::ostream& operator<<(std::ostream& os, const Roman_int& ri);
+    
+    
 /* ------ Roman_int section ends ------ */
 
 
