@@ -119,12 +119,11 @@ namespace Roman {
     
     
     int Roman_int::numeral() {
+        Token tok=digit();
+        vtok.push_back(tok);
         int sum=0;
-        while (true) {
-            Token tok=digit();
-            sum+=tok.value;
-            vtok.push_back(tok);
-        }
+        sum+=tok.value;
+        sum+=numeral();
         return sum;
     }
     

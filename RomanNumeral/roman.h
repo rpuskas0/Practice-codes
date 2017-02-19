@@ -42,7 +42,7 @@ namespace Roman {
     private:
         std::string sroman;
         std::vector<Token> vtok;
-        int ival=0;
+        int ival;
         
         int icount=0;
         Roman_lett lettbuff;
