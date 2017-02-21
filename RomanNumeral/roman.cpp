@@ -35,7 +35,7 @@ namespace Roman {
         }
     }
     
-    char num_to_char(Roman_lett& l) {
+/*    char num_to_char(Roman_lett& l) {
         switch (l) {
             case Roman_lett::N:
                 return 'N';
@@ -65,6 +65,7 @@ namespace Roman {
                 throw Not_rom_lett{};
         }
     }
+*/
 
 /* ------ Roman_lett section ends ------ */
     

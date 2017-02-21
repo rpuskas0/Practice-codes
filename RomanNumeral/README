@@ -1,0 +1,12 @@
+This code is an interesting (but not working) example of me trying to parse some string,
+in this case a roman numeral, before I was introduced with proper IO handling, more
+specifically IO streams. As one would check the code, it becomes quite obvious, that
+the code is messy (although the basic concepts seem to be OK), and needs serious
+restructuring.
+
+The reason I left it in its current state, is because while I was working on the
+Librarian project, I encountered a similar situation there as well (from a learning
+perspective), but I did not think at the time to save the code at that stage. Because
+of that, the opportunity was lost to analize the difference between two very different
+approaches of coding, which was about error handling. This time, this opportunity is
+still present, so let's see how it will turn out after I write a fix some time later...
