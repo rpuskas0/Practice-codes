@@ -1,9 +1,12 @@
 #include <iostream>
 
+//---------------------------------------------------------------
+
 /*
  * This function converts all characters to lower case in 
  * the provided array of char.
  */
+
 void to_lower(char* s) {
     int i=0;
     while (true) {
@@ -15,9 +18,40 @@ void to_lower(char* s) {
     }
 }
 
+//---------------------------------------------------------------
+
 /*
- * This function duplicates an array of char
+ * This function counts the length of an array using subscripting.
  */
+
+int cntarrlen(const char* x) {
+    int xlen=0;
+    while (true) {
+        if (x[xlen]!='\0') {++xlen;}
+        else break;
+    }
+    return xlen;
+}
+
+//---------------------------------------------------------------
+
+/*
+ * This function counts the length of an array using pointer arithmetic.
+ */
+
+int cntarrlen2(const char* carr) {
+    int len=0;
+    while(*carr) {++len; ++carr;};
+    return len;
+}
+
+//---------------------------------------------------------------
+
+/*
+ * This function duplicates an array of char using subscripting.
+ * It also allows to copy (and truncate) an array into a smaller one.
+ */
+
 char* strdup(const char* s, int strlen) {
     char* cptr = new char[strlen];
     int i=0;
@@ -32,24 +66,29 @@ char* strdup(const char* s, int strlen) {
     return cptr;
 }
 
+//---------------------------------------------------------------
+
 /*
- * This function counts the length of an array
+ * This function duplicates an array of char using pointer arithmetic.
+ * This one does not allow truncation and copying into smaller arrays.
  */
-int cntarrlen(const char* x) {
-    int xlen=0;
-    while (true) {
-        if (x[xlen]!='\0') {++xlen;}
-        else break;
-    }
-    return xlen;
+
+char* strdup2(const char* carr) {
+    char* p = new char[cntarrlen2(carr)];
+    char* origp=p;                          // saving the beginning of the new array
+    while (*carr) {*p=*carr; ++carr; ++p;}; // p is now at the end of the array!                               // setting p back to original position
+    return origp;                           // so we return origp instead of p
 }
+
+//---------------------------------------------------------------
 
 /*  
  * This function finds x in s and returns the address of
  * the first character of the first true match (aka.
- * the entirety of x needs to match, not just a character)
+ * the entirety of x needs to match, not just one character)
  * found in s. If no match is found, a nullptr is returned.
  */
+
 const char* findx(const char* s, const char* x) {
     int i=0;
     int j=0;
@@ -58,33 +97,57 @@ const char* findx(const char* s, const char* x) {
     int xstart=0;
     const char* cstart=nullptr;
     
-    // count x length:
-    xlen=cntarrlen(x);
+    xlen=cntarrlen(x);                  // count x length:
    
-    // compare s with x:
-    while (true) {
-        // find first match from x in s:
-        if (s[i]!=x[j]) {++i;}
-        // if first similar charater found:
-        else if(s[i]==x[j]) {
-            //check if the entire x is in s or just a single char was similar
-            while (true) {
-                if (s[i]==x[j]) {++simlen; ++i; ++j;}
-                else {simlen=0; j=0; break;}
-                if(simlen==xlen) {xstart=i-simlen; cstart=&s[xstart]; break;}
+    while (true) {                      // compare s with x:
+        if (s[i]!=x[j]) {++i;}          // find first match from x in s, then
+        else if(s[i]==x[j]) {           // if first similar charater is found,
+            while (true) {              // check if the entirety of x is in s or just a single char was similar
+                if (s[i]==x[j]) {++simlen; ++i; ++j;}   // iterating through both arrays...
+                else {simlen=0; j=0; break;}            // if mismatch found, set array x back to start position
+                if(simlen==xlen) {xstart=i-simlen; cstart=&s[xstart]; break;}   // set start position of true match to a pointer
             }
         }
-        // exit loop if end of s is reached:
-        if (s[i]=='\0') break;
+        if (s[i]=='\0') break;          // exit loop if end of s is reached
     }
     
     return cstart;
 }
 
+//---------------------------------------------------------------
+
+/*
+ * This funtion compares s1 and s2 lexicographically.
+ * If they are equal, the function returns 0,
+ * if s1 comes before s2, the function returns -1,
+ * if s1 comes after s2, the function returns 1.
+ * A shorter, but up to that point identical string
+ * is considered to lexicographically come first.
+ */
+
+int strcmp(const char* s1, const char* s2) {
+    int retval=0;
+        
+    while (*s1 || *s2) {                    // checking letters
+        if (*s1==*s2) {++s1; ++s2;}
+        else if (*s1<*s2) {retval=-1; break;}
+        else if (*s1>*s2) {retval=1; break;}
+    }
+    
+    if (!retval) {                          // checking only string length of (so far) identical strings
+        if (!*s1 && *s2) {return retval=-1;}
+        else if (*s1 && !*s2) {return retval=1;}
+        else return retval;
+    }
+    else return retval;
+}
+
+//---------------------------------------------------------------
+
 /*
  * This function collects and stores all user input into a single char array.
  * An ! mark terminates data collection and returns a pointer to the array.
- * Note: Memory deallocation is deliberately not dealt with this time.
+ * Note: Memory deallocation is deliberately not dealt with this time!
  */
 
 char* istoarr(std::istream& is) {
@@ -116,12 +179,14 @@ char* istoarr(std::istream& is) {
     return carray;
 }
 
+//---------------------------------------------------------------
 
 /*
  * Same function as istoarr, but implemented with std::string instead.
  * It is much simpler, isn't it? Additionally, memory management is
  * automatic, which makes life even simpler (an more efficient).
  */
+
 std::string istostr(std::istream& is) {
     std::string outstr;
     char termchar {'!'};
@@ -137,10 +202,11 @@ std::string istostr(std::istream& is) {
     return outstr;
 }
 
-
+//---------------------------------------------------------------
+//---------------------------------------------------------------
 
 int main() {
-// tolower test:
+// tolower() test:
     std::cout << "--== tolower() test: ==--" << std::endl;
     char cstr[] = "Hello World!";
     char* cptr=&cstr[0];
@@ -153,7 +219,7 @@ int main() {
     std::cout << cstr << std::endl << std::endl;
     
     
-// strdup test:
+// strdup() test:
     std::cout << "--== strdup() test: ==--" << std::endl;
     int newstrlen=10;
     char carray[] {"Test_String Yeah"};
@@ -166,7 +232,7 @@ int main() {
     std::cout << "Copied c-string: " << cptr2 << std::endl << std::endl;
 
     
-// findx test:
+// findx() test:
     std::cout << "--== findx() test: ==--" << std::endl;
     char xarray[] {"_Str"};
     char* cptr3=&carray[0];
@@ -183,16 +249,26 @@ int main() {
     std::cout << std::endl;
  
     
-// istoarr test:
+// istoarr() test:
     std::cout << "Please provide strings to store in array. A ! mark will terminate input." << std::endl;
     char* isarr=istoarr(std::cin);
     
     std::cout << "Stored string is: " << isarr << std::endl;
     
     
-// istoarr to be done with std::string instead of arrays
+// istoarr() to be done with std::string instead of arrays
     std::cout << "Please provide strings to store in std::string. A ! mark will terminate input." << std::endl;
     std::string str1=istostr(std::cin);
     
     std::cout << "Stored string is: " << str1 << std::endl;
+
+    
+// strcmp() test:    
+    const char carr1[] {"ApPs"};
+    const char carr2[] {"App"};
+    int lexi=strcmp(carr1,carr2);
+    
+    if (lexi<0) std::cout << "carr1 comes before carr2" << std::endl;
+    else if (lexi>0) std::cout << "carr1 comes after carr2" << std::endl;
+    else std::cout << "carr1 and carr2 are equal" << std::endl;
 }
