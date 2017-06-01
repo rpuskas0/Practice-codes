@@ -89,7 +89,7 @@ char* strdup(const char* s, int strlen) {
 char* strdup2(const char* carr) {
     char* p = new char[cntarrlen2(carr)];
     char* origp=p;                          // saving the beginning of the new array
-    while (*carr) {*p=*carr; ++carr; ++p;}; // p is now at the end of the array!                               // setting p back to original position
+    while (*carr) {*p=*carr; ++carr; ++p;}; // p is now at the end of the array!
     return origp;                           // so we return origp instead of p
 }
 
@@ -133,7 +133,7 @@ std::string cat_dot(const std::string& s1, const std::string& s2) {
 
 /*
  * This function does also concatenates two C-style strings, but this
- * time we can chose the divider ourselves through a 3rd string.
+ * time we can choose the divider ourselves through a 3rd string.
  * Also uses POINTER ARITHMETIC.
  */
 
@@ -222,7 +222,7 @@ int strcmp(const char* s1, const char* s2) {
         else if (*s1>*s2) {retval=1; break;}
     }
     
-    if (!retval) {                          // checking only string length of (so far) identical strings
+    if (!retval) {                          // checking string length of (so far) identical strings
         if (!*s1 && *s2) {return retval=-1;}
         else if (*s1 && !*s2) {return retval=1;}
         else return retval;
