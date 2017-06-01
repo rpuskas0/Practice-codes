@@ -1,8 +1,21 @@
 #include <iostream>
 
+/*
+ * In these following few example functions I play around with
+ * pointers by using both subscrpiting and pointer arithcmetic.
+ * Some additional functions using STL facilites are also provided
+ * to demonstrate the difference between implementation difficulty.
+ * 
+ * Note: As 'new' is constantly used outside class constructors/destructors
+ * (which in most cases is not recommended at all), memory deallocation
+ * is deliberately not dealt with this time.
+ * A lot of this code WILL leak memory, so don't use it in production software!
+ */
+
+
 //---------------------------------------------------------------
 
-/*
+/* 
  * This function converts all characters to lower case in 
  * the provided array of char.
  */
@@ -21,7 +34,7 @@ void to_lower(char* s) {
 //---------------------------------------------------------------
 
 /*
- * This function counts the length of an array using subscripting.
+ * This function counts the length of an array using SUBSCRIPTING.
  */
 
 int cntarrlen(const char* x) {
@@ -36,7 +49,7 @@ int cntarrlen(const char* x) {
 //---------------------------------------------------------------
 
 /*
- * This function counts the length of an array using pointer arithmetic.
+ * This function counts the length of an array using POINTER ARITHMETIC.
  */
 
 int cntarrlen2(const char* carr) {
@@ -48,7 +61,7 @@ int cntarrlen2(const char* carr) {
 //---------------------------------------------------------------
 
 /*
- * This function duplicates an array of char using subscripting.
+ * This function duplicates an array of char using SUBSCRIPTING.
  * It also allows to copy (and truncate) an array into a smaller one.
  */
 
@@ -69,7 +82,7 @@ char* strdup(const char* s, int strlen) {
 //---------------------------------------------------------------
 
 /*
- * This function duplicates an array of char using pointer arithmetic.
+ * This function duplicates an array of char using POINTER ARITHMETIC.
  * This one does not allow truncation and copying into smaller arrays.
  */
 
@@ -78,6 +91,81 @@ char* strdup2(const char* carr) {
     char* origp=p;                          // saving the beginning of the new array
     while (*carr) {*p=*carr; ++carr; ++p;}; // p is now at the end of the array!                               // setting p back to original position
     return origp;                           // so we return origp instead of p
+}
+
+//---------------------------------------------------------------
+
+/*
+ * This function concatenates two C-style strings with a dot character
+ * as a separator using POINTER ARITHMETIC.
+ */
+char* pcat_dot(const char* s1, const char* s2) {
+    const char divider {'.'};
+    int arrlen=2;
+    arrlen+=cntarrlen(s1);
+    arrlen+=cntarrlen(s2);
+    
+    char* p = new char[arrlen];
+    char* origp=p;
+    while(*s1) {*p=*s1; ++p; ++s1;}
+    *p=divider; ++p;
+    while(*s2) {*p=*s2; ++p; ++s2;}
+    
+    return origp;
+}
+
+//---------------------------------------------------------------
+
+/*
+ * This function also concatenates two strings, but it is implemented
+ * with std::string instead. It is here to demonstrate the difference
+ * in implementation difficulty between the two.
+ */
+std::string cat_dot(const std::string& s1, const std::string& s2) {
+    const char divider {'.'};
+    std::string concstr=s1;
+    concstr.push_back(divider);
+    concstr+=s2;
+    return concstr;
+}
+
+//---------------------------------------------------------------
+
+/*
+ * This function does also concatenates two C-style strings, but this
+ * time we can chose the divider ourselves through a 3rd string.
+ * Also uses POINTER ARITHMETIC.
+ */
+
+char* pcat_str(const char* s1, const char* s2, const char* div) {
+    int arrlen=1;
+    arrlen+=cntarrlen(s1);
+    arrlen+=cntarrlen(s2);
+    arrlen+=cntarrlen(div);
+    
+    char* p = new char[arrlen];
+    char* origp=p;
+    while(*s1) {*p=*s1; ++p; ++s1;}
+    while(*div) {*p=*div; ++p; ++div;}
+    while(*s2) {*p=*s2; ++p; ++s2;}
+    
+    return origp;
+}
+
+//---------------------------------------------------------------
+
+/*
+ * This function also concatenates two strings, but it is implemented
+ * with std::string instead, and also allows a 3rd string to be used
+ * as user defined divider. Also uses POINTER ARITHMETIC.
+ * Note: Notice how this one looks the most simple of all four "concatenators".
+ */
+
+std::string cat_str(const std::string& s1, const std::string& s2, const std::string& div) {
+    std::string concstr=s1;
+    concstr+=div;
+    concstr+=s2;
+    return concstr;
 }
 
 //---------------------------------------------------------------
@@ -147,7 +235,6 @@ int strcmp(const char* s1, const char* s2) {
 /*
  * This function collects and stores all user input into a single char array.
  * An ! mark terminates data collection and returns a pointer to the array.
- * Note: Memory deallocation is deliberately not dealt with this time!
  */
 
 char* istoarr(std::istream& is) {
@@ -183,7 +270,7 @@ char* istoarr(std::istream& is) {
 
 /*
  * Same function as istoarr, but implemented with std::string instead.
- * It is much simpler, isn't it? Additionally, memory management is
+ * It is much simpler, isn't it? Additionally, note that memory management is
  * automatic, which makes life even simpler (an more efficient).
  */
 
@@ -271,4 +358,15 @@ int main() {
     if (lexi<0) std::cout << "carr1 comes before carr2" << std::endl;
     else if (lexi>0) std::cout << "carr1 comes after carr2" << std::endl;
     else std::cout << "carr1 and carr2 are equal" << std::endl;
+
+
+// pcat_dot() and pcat_str() test:
+    char cs1[] {"Nicola"};
+    char cs2[] {"Tesla"};
+    char cdiv1[] {" . "};
+    char* comb=pcat_dot(cs1,cs2);
+    char* comb2=pcat_str(cs1,cs2,cdiv1);
+    
+    std::cout << comb << std::endl;
+    std::cout << comb2 << std::endl;
 }
