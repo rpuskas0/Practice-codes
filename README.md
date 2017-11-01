@@ -1,5 +1,5 @@
-This repository contains only small projects that I use as tools to learn C++ programming.
-Not everything gets uploaded, only code that deals with some more interesting problems.
+This repository contains only small projects that I use as tools to learn C or C++ programming.
+Not everything gets uploaded, only code that deals with some (at the time) interesting problems.
 Also, since these little projects are only used for educational purposes, no mature code
 is to be expected.
 
