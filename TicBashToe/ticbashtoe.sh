@@ -1,8 +1,21 @@
 #!/bin/bash
 
 # This is an entirely bash script based tic-tac-toe game.
-# I wrote it just to see if something like this could be
-# done purely using Bash.
+# 
+# It can:
+# 1. save games during exit or when finished.
+# 2. load a previous save if provided as an argument.
+#    It loads positions, timestamp and move count, so
+#    game progresses from where it was interrupted previously.
+#
+# It cannot (right now):
+# 1. load the entire history of a saved game.
+# 2. append continued game to previously saved game file.
+# 3. check for corrupted save file.
+# 4. provide eyecandy (probably never will).
+# 
+# I wrote this game just to see if something like this
+# could be done purely using Bash.
 # Please enjoy, especially the graphics :)
 
 self=$( realpath $0 )
@@ -10,6 +23,8 @@ selfpath=$( dirname $self )
 
 moves_count=0
 select='1 2 3 4 5 6 7 8 9 quit'
+saved_game=$1
+saved_time=0
 tmpfile=''
 
 reset_game () {
@@ -67,11 +82,62 @@ draw_grid () {
     echo " "
 }
 
+read_saved_grid () {
+     pos1=$(cat $saved_game | tail -n 7 | head -n 1 | awk '{print $1}')
+     pos2=$(cat $saved_game | tail -n 7 | head -n 1 | awk '{print $2}')
+     pos3=$(cat $saved_game | tail -n 7 | head -n 1 | awk '{print $3}')
+     pos4=$(cat $saved_game | tail -n 5 | head -n 1 | awk '{print $1}')
+     pos5=$(cat $saved_game | tail -n 5 | head -n 1 | awk '{print $2}')
+     pos6=$(cat $saved_game | tail -n 5 | head -n 1 | awk '{print $3}')
+     pos7=$(cat $saved_game | tail -n 3 | head -n 1 | awk '{print $1}')
+     pos8=$(cat $saved_game | tail -n 3 | head -n 1 | awk '{print $2}')
+     pos9=$(cat $saved_game | tail -n 3 | head -n 1 | awk '{print $3}')
+}
+
+read_saved_time () {
+    saved_time=$(cat $saved_game | tail -n 9 | head -n 1 | awk '{print $3}' )
+}
+
+read_saved_move_count () {
+    moves_count=$(cat $saved_game | tail -n 9 | head -n 1 | awk '{print $6}' | sed 's/#//g')
+}
+
+is_game_ended () {
+    if [ $(cat $saved_game | tail -n 1 | awk '{print $1}') == '->' ]
+    then
+        return 1
+    else
+        return 0
+    fi
+}
+
+load_game () {
+    is_game_ended
+    if [ $? -eq 1 ]
+    then
+        echo "Game could not be loaded for playing, as it was already finished."
+        exit
+    else
+        read_saved_grid
+        read_saved_time
+        read_saved_move_count
+    fi
+}
+
 init_game () {
-    reset_game
-    make_tmpfile
-    clear
-    draw_grid
+    if [ -z $saved_game ]
+    then
+        reset_game
+        make_tmpfile
+        clear
+        draw_grid
+    else
+        reset_game
+        make_tmpfile
+        load_game
+        clear
+        draw_grid
+    fi
 }
 
 check_nums () {
@@ -113,7 +179,8 @@ check_for_tie () {
 }
 
 record_moves () {
-    echo "Time: $SECONDS secs, Move: #$moves_count" >> $tmpfile
+    let local elapsed_time=$SECONDS+$saved_time
+    echo "-> Time: $elapsed_time secs, Move: #$moves_count" >> $tmpfile
     echo " " >> $tmpfile
     draw_grid >> $tmpfile
     echo " " >> $tmpfile
@@ -173,16 +240,16 @@ draw_and_record () {
 print_win_message () {
     if [ $( expr $moves_count % 2 ) -eq 0 ]
     then
-        echo "O wins!"
+        echo "-> O wins!"
     else
-        echo "X wins!"
+        echo "-> X wins!"
     fi
-    echo "The game took $moves_count moves and $SECONDS seconds to finish."
+    echo "-> The game took $moves_count moves and $SECONDS seconds to finish."
 }
 
 print_tie_message () {
-    echo "The game was a tie."
-       echo "The game took $moves_count moves and $SECONDS seconds to finish."
+    echo "-> The game was a tie."
+       echo "-> The game took $moves_count moves and $SECONDS seconds to finish."
 }
 
 check_win_or_tie () {
